@@ -345,9 +345,11 @@ function renderConditionsDirectory() {
 }
 function renderMedicationsDirectory() {
   const el = qs('#medDir'); if (!el) return;
-  el.innerHTML = DATA.medications.map(m => `<a class="row" href="medication.html?m=${m.id}" data-tags="${m.specs.join(' ')}"><div><b>${m.name}</b><span>${m.generic}</span></div><div><span class="tagx">${m.form}</span></div><div><span>${m.specs.map(id => specById(id).name).join(', ')}</span></div><span class="arrow">${icon('arr')}</span></a>`).join('');
-  const chips = qs('#medChips'); if (chips) chips.innerHTML = `<button class="chip on" data-f="all">All</button>` + DATA.specialties.map(s => `<button class="chip" data-f="${s.id}">${s.name}</button>`).join('');
-  const cnt = qs('[data-count-of="#medDir"]'); if (cnt) cnt.textContent = DATA.medications.length + ' results';
+  const letters = [...new Set(DATA.medications.map(m => m.name[0].toUpperCase()))];
+  const idx = qs('#medIndex'); if (idx) idx.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => letters.includes(l) ? `<a href="#m-${l}" class="chip">${l}</a>` : `<span class="chip off">${l}</span>`).join('');
+  el.innerHTML = letters.map(l => `<div class="fgroup" id="m-${l}"><h3 class="fletter">${l}</h3><div class="medgrid">` + DATA.medications.filter(m => m.name[0].toUpperCase() === l).map(m =>
+    `<a class="card fcard-med" href="medication.html?m=${m.id}"><div class="top"><b>${m.name}</b><span class="sm">${m.generic}</span><span class="tagx">${m.form}</span></div><span class="sm" style="margin-top:4px">${m.time}</span><span class="link" style="margin-top:10px">View details ${icon('arr')}</span></a>`).join('') + '</div></div>').join('');
+  const cnt = qs('[data-count-of="#medDir"]'); if (cnt) cnt.textContent = DATA.medications.length + ' medications, A–Z';
 }
 function renderReferralForms() {
   const el = qs('#formsList'); if (!el) return;
