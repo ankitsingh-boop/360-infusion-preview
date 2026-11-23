@@ -24,15 +24,15 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 /* type */
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text)}
 .eyebrow svg{width:14px;height:14px;color:var(--orange);stroke-width:2.2}
-.h1{font-size:clamp(42px,5.2vw,74px);line-height:1.02;letter-spacing:-.035em;font-weight:800}
-.h2{font-size:clamp(32px,3.6vw,52px);line-height:1.06;letter-spacing:-.03em;font-weight:800}
+.h1{font-size:clamp(34px,3.6vw,52px);line-height:1.08;letter-spacing:-.035em;font-weight:800}
+.h2{font-size:clamp(26px,2.6vw,38px);line-height:1.12;letter-spacing:-.03em;font-weight:800}
 .h3{font-size:22px;line-height:1.25;letter-spacing:-.015em;font-weight:700}
 .h4{font-size:17px;line-height:1.3;letter-spacing:-.01em;font-weight:700}
 .dim{color:var(--mute2)}
 .acc{color:var(--orange)}
 .lead{font-size:clamp(16px,1.25vw,18px);color:var(--muted);max-width:54ch}
 .sm{font-size:14px;color:var(--muted)}
-.sec-head{display:grid;grid-template-columns:1.3fr 1fr;gap:40px;align-items:end;margin-bottom:48px}
+.sec-head{display:grid;grid-template-columns:1.6fr 1fr;gap:32px;align-items:end;margin-bottom:40px}
 .sec-head .eyebrow{margin-bottom:20px}
 .sec-head p{color:var(--muted);max-width:44ch;justify-self:end}
 .sec-head .right{justify-self:end;display:flex;flex-direction:column;align-items:flex-start;gap:18px}
@@ -157,7 +157,8 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 .hero{padding:clamp(32px,5vw,64px) 0 0}
 .hero-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:22px;align-items:stretch}
 .hero-copy{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:clamp(28px,4vw,52px);display:flex;flex-direction:column;justify-content:space-between;gap:36px}
-.hero-copy .eyebrow{margin-bottom:26px}
+.hero-copy .eyebrow{margin-bottom:22px}
+.hero-copy .h1{font-size:clamp(32px,3.1vw,42px)}
 .hero-copy .lead{margin:24px 0 32px}
 .hero-meta{display:flex;gap:28px;padding-top:26px;border-top:1px solid var(--border);flex-wrap:wrap}
 .hero-meta div{font-size:13px;color:var(--muted);line-height:1.4}
@@ -209,6 +210,16 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 .dir-head{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:18px;padding:0 22px 10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
 
 /* referral forms */
+.medgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:8px}
+.fcard-med{padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.fcard-med .top{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.fcard-med .top b{font-size:17px;line-height:1.2}
+.fcard-med .tagx{font-size:11px}
+.fcard-med .btns{margin-top:10px;gap:8px}
+.fcard-med .btns .btn{flex:1 1 auto}
+.findex .chip.off{opacity:.35;pointer-events:none}
+@media (max-width:1100px){.medgrid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.medgrid{grid-template-columns:1fr}}
 .fletter{font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--orange);margin:28px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 .fgroup:first-child .fletter{margin-top:0}
 .fgroup .row{margin-bottom:10px}
@@ -257,7 +268,7 @@ svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stro
 .split-copy.navy p.l{color:#C3CFE2}
 .split-copy .eyebrow{margin-bottom:22px}
 .split-copy p.l{color:var(--muted);margin:20px 0 32px;max-width:46ch}
-.split-copy .h2{font-size:clamp(30px,3.2vw,46px)}
+.split-copy .h2{font-size:clamp(26px,2.4vw,34px)}
 .feats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:auto}
 .feats div{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid rgba(23,29,38,.1);border-radius:14px;font-size:14px;font-weight:600}
 .dark .feats div,.navy .feats div{border-color:rgba(255,255,255,.14)}
@@ -374,7 +385,8 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .files{display:grid;gap:8px;margin-top:10px}
 .files div{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 14px;background:var(--soft);border-radius:10px}
 .files button{color:var(--muted);font-weight:700}
-.wiz{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start}
+.wiz{display:grid;grid-template-columns:1fr;gap:22px;align-items:start;max-width:960px;margin:0 auto}
+.wiz-side{display:none}
 .wiz-side{background:var(--navy);color:#fff;border-radius:var(--r-lg);padding:30px;position:sticky;top:110px}
 .wiz-side h3{font-size:20px;letter-spacing:-.02em;margin-bottom:6px}
 .wiz-side p{font-size:13px;color:#9FB0CC;margin-bottom:26px}
@@ -390,11 +402,13 @@ select.in{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns=
 .prog{height:6px;background:rgba(255,255,255,.15);border-radius:999px;margin-top:26px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--orange);border-radius:999px;transition:width .4s}
 .wiz-main{background:#fff;border:1px solid var(--border);border-radius:var(--r-lg);padding:clamp(24px,3.5vw,44px)}
-.wpane{display:none}
+.wpane{display:none;padding:26px 0;border-top:1px solid var(--border)}
+.wpane:first-child{border-top:0;padding-top:0}
 .wpane.on{display:block;animation:fade .4s}
 .wpane .h3{margin-bottom:6px}
 .wpane>p.sm{margin-bottom:26px}
-.wnav{display:flex;justify-content:space-between;gap:12px;margin-top:30px;padding-top:22px;border-top:1px solid var(--border)}
+.wnav{display:flex;justify-content:flex-end;gap:12px;margin-top:10px;padding-top:22px;border-top:1px solid var(--border)}
+.wnav [data-wprev],.wnav [data-wnext]{display:none}
 .review{display:grid;gap:12px}
 .review div{display:grid;grid-template-columns:180px 1fr;gap:12px;padding:12px 16px;background:var(--soft);border-radius:12px;font-size:14px}
 .review div b{color:var(--muted);font-weight:600}
@@ -449,6 +463,7 @@ footer{background:var(--text);color:#C9CED6;margin-top:clamp(64px,8vw,112px);pad
 
 /* reveal */
 .rv{opacity:0;transform:translateY(18px);transition:opacity .8s ease,transform .8s ease}
+body.loaded .tab-pane .rv,body.loaded .wpane .rv{opacity:1;transform:none}
 .rv.shown{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none}*{transition:none!important}}
 

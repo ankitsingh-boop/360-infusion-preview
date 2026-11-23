@@ -19,27 +19,18 @@ const DATA = {
   conditions: [
     { id:'rheumatoid-arthritis', name:'Rheumatoid Arthritis', spec:'rheumatology', meds:['actemra','orencia','remicade','simponi-aria'] },
     { id:'psoriatic-arthritis', name:'Psoriatic Arthritis', spec:'rheumatology', meds:['cosentyx','remicade','simponi-aria'] },
-    { id:'ankylosing-spondylitis', name:'Ankylosing Spondylitis', spec:'rheumatology', meds:['cosentyx','remicade','simponi-aria'] },
     { id:'lupus', name:'Lupus (SLE)', spec:'rheumatology', meds:['benlysta'] },
-    { id:'gout', name:'Chronic Gout', spec:'rheumatology', meds:['krystexxa'] },
     { id:'crohns-disease', name:'Crohn’s Disease', spec:'gastroenterology', meds:['entyvio','remicade','skyrizi','stelara'] },
     { id:'ulcerative-colitis', name:'Ulcerative Colitis', spec:'gastroenterology', meds:['entyvio','remicade','stelara'] },
-    { id:'multiple-sclerosis', name:'Multiple Sclerosis', spec:'neurology', meds:['lemtrada','ocrevus','tysabri'] },
+    { id:'multiple-sclerosis', name:'Multiple Sclerosis', spec:'neurology', meds:['ocrevus','tysabri'] },
     { id:'migraine', name:'Chronic Migraine', spec:'neurology', meds:['vyepti'] },
-    { id:'myasthenia-gravis', name:'Myasthenia Gravis', spec:'neurology', meds:['soliris','ultomiris','vyvgart'] },
-    { id:'cidp', name:'CIDP', spec:'immunology', meds:['gammagard','gamunex-c','privigen'] },
-    { id:'immune-deficiency', name:'Primary Immune Deficiency', spec:'immunology', meds:['cuvitru','gammagard','hizentra','privigen'] },
-    { id:'psoriasis', name:'Plaque Psoriasis', spec:'dermatology', meds:['cosentyx','ilumya','skyrizi','stelara'] },
-    { id:'hidradenitis', name:'Hidradenitis Suppurativa', spec:'dermatology', meds:['cosentyx','humira'] },
-    { id:'atopic-dermatitis', name:'Atopic Dermatitis', spec:'dermatology', meds:['dupixent'] },
-    { id:'asthma', name:'Severe Asthma', spec:'pulmonology', meds:['cinqair','nucala','tezspire','xolair'] },
-    { id:'alpha-1', name:'Alpha-1 Antitrypsin Deficiency', spec:'pulmonology', meds:['aralast-np','glassia','prolastin-c','zemaira'] },
+    { id:'myasthenia-gravis', name:'Myasthenia Gravis', spec:'neurology', meds:['soliris','vyvgart'] },
+    { id:'immune-deficiency', name:'Primary Immune Deficiency', spec:'immunology', meds:['gammagard','privigen'] },
+    { id:'psoriasis', name:'Plaque Psoriasis', spec:'dermatology', meds:['cosentyx','skyrizi','stelara'] },
+    { id:'asthma', name:'Severe Asthma', spec:'pulmonology', meds:['nucala','xolair'] },
     { id:'osteoporosis', name:'Osteoporosis', spec:'endocrinology', meds:['evenity','prolia','reclast'] },
-    { id:'high-cholesterol', name:'High Cholesterol (LDL)', spec:'cardiology', meds:['leqvio'] },
-    { id:'iron-deficiency', name:'Iron Deficiency Anemia', spec:'primary-care', meds:['feraheme','injectafer','venofer'] },
-    { id:'ckd-anemia', name:'Anemia of Chronic Kidney Disease', spec:'nephrology', meds:['aranesp'] },
-    { id:'thyroid-eye-disease', name:'Thyroid Eye Disease', spec:'endocrinology', meds:['tepezza'] },
-    { id:'serious-infections', name:'Serious Bacterial Infections', spec:'infectious-disease', meds:['cubicin','dalvance','invanz','rocephin','vancomycin'] }
+    { id:'iron-deficiency', name:'Iron Deficiency Anemia', spec:'primary-care', meds:['injectafer','venofer'] },
+    { id:'high-cholesterol', name:'High Cholesterol (LDL)', spec:'cardiology', meds:['leqvio'] }
   ],
   // Alphabetical A–Z list of medications with referral/order forms (from the clinic's provider page).
   medications: [
@@ -152,6 +143,7 @@ function initGlobal() {
   // reveal
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('shown'); io.unobserve(e.target); } }), { threshold: .1 });
   qsa('.rv').forEach((el, i) => { el.style.transitionDelay = (i % 3) * 70 + 'ms'; io.observe(el); });
+  setTimeout(() => { document.body.classList.add('loaded'); qsa('.rv:not(.shown)').forEach(el => { const r = el.getBoundingClientRect(); if (r.top < innerHeight && r.bottom > 0) el.classList.add('shown'); }); }, 1200);
   // today's hours highlight
   const d = new Date().getDay();
   qsa('.hours [data-day]').forEach(el => { if (+el.dataset.day === d) el.classList.add('today'); });
@@ -160,7 +152,7 @@ function initGlobal() {
     const btns = qsa('button', t), panes = qsa('.tab-pane', t.parentElement);
     btns.forEach((b, i) => b.addEventListener('click', () => {
       btns.forEach(x => x.classList.remove('on')); panes.forEach(x => x.classList.remove('on'));
-      b.classList.add('on'); panes[i] && panes[i].classList.add('on');
+      b.classList.add('on'); if (panes[i]) { panes[i].classList.add('on'); qsa('.rv', panes[i]).forEach(x => x.classList.add('shown')); qsa('.acc-item.on .acc-body', panes[i]).forEach(bd => bd.style.maxHeight = bd.scrollHeight + 'px'); }
     }));
   });
   // accordion
@@ -269,6 +261,7 @@ function validate(scope) {
   let ok = true;
   qsa('[required]', scope).forEach(el => {
     if (el.closest('.wpane') && !el.closest('.wpane').classList.contains('on')) return;
+    if (el.closest('.hide')) return;
     const wrap = el.closest('.fld') || el.parentElement;
     let bad = el.type === 'checkbox' ? !el.checked : el.type === 'radio' ? !qsa(`input[name="${el.name}"]`, scope).some(r => r.checked) : !el.value.trim();
     if (!bad && el.type === 'email') bad = !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(el.value);
@@ -293,17 +286,10 @@ function initUpload(u) {
   }
 }
 function initWizard(w) {
-  const panes = qsa('.wpane', w), steps = qsa('.wsteps div', w), prog = qs('.prog i', w);
-  const prev = qs('[data-wprev]', w), next = qs('[data-wnext]', w), submit = qs('[data-wsubmit]', w);
-  let i = 0;
-  function show(n) {
-    i = n; panes.forEach((p, k) => p.classList.toggle('on', k === i));
-    steps.forEach((s, k) => { s.classList.toggle('on', k === i); s.classList.toggle('done', k < i); });
-    if (prog) prog.style.width = ((i + 1) / panes.length * 100) + '%';
-    prev.disabled = i === 0; next.classList.toggle('hide', i >= panes.length - 2); submit.classList.toggle('hide', i !== panes.length - 2);
-    if (i === panes.length - 2) buildReview();
-    if (n > 0 || w.dataset.started) w.scrollIntoView({ behavior: 'smooth', block: 'start' }); w.dataset.started = 1;
-  }
+  const panes = qsa('.wpane', w), submit = qs('[data-wsubmit]', w);
+  const confirm = panes[panes.length - 1];
+  panes.forEach((p, k) => { if (k < panes.length - 1) p.classList.add('on'); });
+  submit.classList.remove('hide');
   function buildReview() {
     const r = qs('.review', w); if (!r) return; r.innerHTML = '';
     qsa('input,select,textarea', w).forEach(el => {
@@ -315,15 +301,14 @@ function initWizard(w) {
       r.insertAdjacentHTML('beforeend', `<div><b>${lbl.replace('*', '').trim()}</b><span>${val}</span></div>`);
     });
   }
-  prev.onclick = () => show(i - 1);
-  next.onclick = () => { if (validate(panes[i])) show(i + 1); else toast('Please complete the highlighted fields.'); };
   submit.onclick = () => {
-    if (!validate(panes[i])) return toast('Please complete the highlighted fields.');
+    if (!validate(w)) { const bad = qs('.err', w); bad && bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); return toast('Please complete the highlighted fields.'); }
+    buildReview();
     const ref = (w.dataset.prefix || 'REF') + '-' + new Date().getFullYear() + '-' + Math.random().toString(36).slice(2, 8).toUpperCase();
     qsa('[data-ref]', w).forEach(el => el.textContent = ref);
-    show(panes.length - 1); qs('.wnav', w).classList.add('hide'); toast('Submitted. Reference ' + ref);
+    panes.forEach(p => p.classList.remove('on')); confirm.classList.add('on'); qs('.wnav', w).classList.add('hide');
+    w.scrollIntoView({ behavior: 'smooth', block: 'start' }); toast('Submitted. Reference ' + ref);
   };
-  show(0);
 }
 
 /* ---------- dynamic pages ---------- */
@@ -334,7 +319,7 @@ function renderConditionPage() {
   qsa('[data-cname]').forEach(x => x.textContent = c.name);
   qsa('[data-sname]').forEach(x => x.textContent = s.name);
   document.title = `${c.name} Infusion Therapy | 360 Infusion Center`;
-  qs('#condMeds').innerHTML = meds.map(m => `<a class="card" href="medication.html?m=${m.id}"><span class="badge">${m.form}</span><h3 class="h3" style="margin:18px 0 4px">${m.name}</h3><p class="sm">${m.generic}</p><p class="sm" style="margin-top:10px">${m.time}</p><span class="link" style="margin-top:18px">View medication ${icon('arr')}</span></a>`).join('');
+  const cm = qs('#condMeds'); if (cm) cm.innerHTML = `<div class="note">${icon('info')}<span>Your physician selects the medication and dose. Providers can find every order form in the <a href="referral-forms.html"><b>A–Z referral forms</b></a>.</span></div>`;
   const related = DATA.conditions.filter(x => x.spec === c.spec && x.id !== c.id);
   qs('#condRelated').innerHTML = related.length ? related.map(x => `<a class="chip" href="condition.html?c=${x.id}">${x.name}</a>`).join('') : '<span class="sm">No other listed conditions in this specialty yet.</span>';
 }
@@ -353,8 +338,9 @@ function renderMedicationPage() {
 }
 function renderConditionsDirectory() {
   const el = qs('#condDir'); if (!el) return;
-  el.innerHTML = DATA.conditions.map(c => { const s = specById(c.spec); return `<a class="row" href="condition.html?c=${c.id}" data-tags="${c.spec}"><div><b>${c.name}</b><span>${c.meds.length} listed medication${c.meds.length > 1 ? 's' : ''}</span></div><div><span class="tagx">${s.name}</span></div><div><span>${c.meds.slice(0, 3).map(id => medById(id).name).join(', ')}</span></div><span class="arrow">${icon('arr')}</span></a>`; }).join('');
-  const chips = qs('#condChips'); if (chips) chips.innerHTML = `<button class="chip on" data-f="all">All</button>` + DATA.specialties.map(s => `<button class="chip" data-f="${s.id}">${s.name}</button>`).join('');
+  el.innerHTML = DATA.conditions.map(c => { const s = specById(c.spec); return `<a class="row" href="condition.html?c=${c.id}" data-tags="${c.spec}" style="grid-template-columns:1.6fr 1fr auto"><div><b>${c.name}</b><span>Physician-directed infusion therapy</span></div><div><span class="tagx">${s.name}</span></div><span class="arrow">${icon('arr')}</span></a>`; }).join('');
+  const used = new Set(DATA.conditions.map(c => c.spec));
+  const chips = qs('#condChips'); if (chips) chips.innerHTML = `<button class="chip on" data-f="all">All</button>` + DATA.specialties.filter(s => used.has(s.id)).map(s => `<button class="chip" data-f="${s.id}">${s.name}</button>`).join('');
   const cnt = qs('[data-count-of="#condDir"]'); if (cnt) cnt.textContent = DATA.conditions.length + ' results';
 }
 function renderMedicationsDirectory() {
@@ -366,10 +352,11 @@ function renderMedicationsDirectory() {
 function renderReferralForms() {
   const el = qs('#formsList'); if (!el) return;
   const letters = [...new Set(DATA.medications.map(m => m.name[0].toUpperCase()))];
-  const idx = qs('#formsIndex'); if (idx) idx.innerHTML = letters.map(l => `<a href="#f-${l}" class="chip">${l}</a>`).join('');
-  el.innerHTML = letters.map(l => `<div class="fgroup" id="f-${l}"><h3 class="fletter">${l}</h3>` + DATA.medications.filter(m => m.name[0].toUpperCase() === l).map(m =>
-    `<div class="row frow" data-name="${(m.name + ' ' + m.generic).toLowerCase()}" style="grid-template-columns:1.6fr 1fr auto auto"><div><b>${m.name}</b><span>${m.generic}</span></div><div><span class="tagx">${m.form}</span></div><a href="medication.html?m=${m.id}" class="btn btn-l btn-sm">Details</a>` +
-    (m.pdf ? `<a href="${m.pdf}" class="btn btn-n btn-sm" target="_blank" rel="noopener">${icon('dl')}Order form</a>` : `<a href="mailto:${EMAIL}?subject=Referral form request: ${encodeURIComponent(m.name)}" class="btn btn-l btn-sm">${icon('mail')}Request form</a>`) + `</div>`).join('') + '</div>').join('');
+  const idx = qs('#formsIndex'); if (idx) idx.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => letters.includes(l) ? `<a href="#f-${l}" class="chip">${l}</a>` : `<span class="chip off">${l}</span>`).join('');
+  el.innerHTML = letters.map(l => `<div class="fgroup" id="f-${l}"><h3 class="fletter">${l}</h3><div class="medgrid">` + DATA.medications.filter(m => m.name[0].toUpperCase() === l).map(m =>
+    `<div class="card flat fcard-med frow" data-name="${(m.name + ' ' + m.generic).toLowerCase()}"><div class="top"><b>${m.name}</b><span class="sm">${m.generic}</span><span class="tagx">${m.form}</span></div><div class="btns">` +
+    (m.pdf ? `<a href="${m.pdf}" class="btn btn-n btn-sm" target="_blank" rel="noopener">${icon('dl')}Order form</a>` : `<a href="mailto:${EMAIL}?subject=Referral form request: ${encodeURIComponent(m.name)}" class="btn btn-l btn-sm">${icon('mail')}Request form</a>`) +
+    `<a href="medication.html?m=${m.id}" class="btn btn-l btn-sm">Details</a></div></div>`).join('') + '</div></div>').join('');
   const inp = qs('#formsSearch'), cnt = qs('#formsCount'), none = qs('#formsNone');
   const total = DATA.medications.length; if (cnt) cnt.textContent = total + ' medications';
   if (inp) inp.addEventListener('input', () => {
@@ -382,7 +369,7 @@ function renderReferralForms() {
 }
 function renderSpecialtyCards() {
   qsa('[data-specialties]').forEach(el => {
-    el.innerHTML = DATA.specialties.map((s, k) => { const n = DATA.conditions.filter(c => c.spec === s.id).length; return `<a class="card quick ${s.tint} rv" href="conditions.html#${s.id}" data-spec="${s.id}"><div style="display:flex;justify-content:space-between;align-items:center"><span class="ic big">${icon(s.icon)}</span><span class="badge">${n ? n + ' condition' + (n !== 1 ? 's' : '') : 'And more'}</span></div><h3 class="h4">${s.name}</h3><p>${s.blurb}</p><div class="foot"><span class="link">Explore</span><span class="arrow">${icon('arr')}</span></div></a>`; }).join('');
+    el.innerHTML = DATA.specialties.map((s, k) => { const n = DATA.conditions.filter(c => c.spec === s.id).length; return `<a class="card quick ${s.tint} rv" href="conditions.html#${s.id}" data-spec="${s.id}"><div style="display:flex;justify-content:space-between;align-items:center"><span class="ic big">${icon(s.icon)}</span><span class="badge">${n ? n + ' condition' + (n !== 1 ? 's' : '') : 'Physician-ordered'}</span></div><h3 class="h4">${s.name}</h3><p>${s.blurb}</p><div class="foot"><span class="link">Explore</span><span class="arrow">${icon('arr')}</span></div></a>`; }).join('');
   });
 }
 function populateSelects() {
@@ -395,5 +382,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderConditionPage(); renderMedicationPage(); renderConditionsDirectory(); renderMedicationsDirectory(); renderReferralForms(); renderSpecialtyCards(); populateSelects();
   initGlobal();
   // deep link to a specialty filter chip
-  if (location.hash) { const ch = qs(`.chip[data-f="${location.hash.slice(1)}"]`); ch && ch.click(); }
+  if (location.hash) {
+    const ch = qs(`.chip[data-f="${location.hash.slice(1)}"]`); ch && ch.click();
+    const pane = qs(`.tab-pane${location.hash}`); if (pane) { const panes = qsa('.tab-pane', pane.parentElement), i = panes.indexOf(pane); const btn = qsa('.tabs button', pane.parentElement)[i]; btn && btn.click(); setTimeout(() => pane.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100); }
+  }
+  addEventListener('hashchange', () => { const pane = qs(`.tab-pane${location.hash}`); if (pane) { const panes = qsa('.tab-pane', pane.parentElement), i = panes.indexOf(pane); const btn = qsa('.tabs button', pane.parentElement)[i]; btn && btn.click(); } });
 });
